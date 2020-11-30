@@ -1,45 +1,51 @@
-# Ledbetter
+# Embarrsingly simple zero-shot learning
 
-Ledbetter is a simple script for gathering Nagios problem statistics and submitting them to Graphite. It focuses on summary (overall, servicegroup and hostgroup) statistics and writes them to the `nagios.problems` metrics namespace within Graphite.
+This is the implementation of the paper "An embarrassingly simple approach to zero-shot learning." (EsZsl) ICML, [[pdf]](http://proceedings.mlr.press/v37/romera-paredes15.pdf). 
 
-## Installation
+The file `demo_eszsl` is a jupyter notebook which contains a walk through of EsZsl.
 
-Clone the GitHub repository and use Bundler to install the gem dependencies.
+## Dataset
 
-```
-$ git clone https://github.com/github/ledbetter.git
-$ cd ledbetter
-$ bundle install
-```
+The dataset splits can be downloaded [here](https://www.mpi-inf.mpg.de/departments/computer-vision-and-multimodal-computing/research/zero-shot-learning/zero-shot-learning-the-good-the-bad-and-the-ugly/), please download the `Proposed Split` and place it in the same folder. 
 
-## Usage
+Find additional details about the dataset in the `README.md` of the `Proposed split`.
 
-Ledbetter requires a number of environment variables for runtime configuration. The following example demonstrates how to run it manually from the command line, but you would typically run it as a cron job.
+## Training and Testing
+
+If you want to skip the demo and just run training and testing for different dataset splits use:
 
 ```
-$ export NAGIOS_URL=http://nagios.foo.com/cgi-bin/nagios3
-$ export NAGIOS_USER=foo
-$ export NAGIOS_PASS=bar
-$ export CARBON_URL=carbon://localhost:2003
-$ bundle exec ruby ledbetter.rb
-```
-
-Optionally you can set `DEBUG=1` to also print statistics to `stdout`. `CARBON_PREFIX` can also be set to override the default namespace (`nagios.problems`).
+python main.py --dataset SUN --dataset_path xlsa17/data/ --alpha 3 --gamma 1
 
 ```
-$ DEBUG=1 bundle exec ruby ledbetter.rb
-nagios.problems.all 41 1359170720
-nagios.problems.critical 27 1359170720
-nagios.problems.warning 12 1359170720
-nagios.problems.unknown 2 1359170720
-nagios.problems.servicegroups.apache 0 1359170720
-nagios.problems.servicegroups.backups 3 1359170720
-nagios.problems.servicegroups.dns 0 1359170720
-nagios.problems.servicegroups.mysql 1 1359170720
-...
+Setting the hyperparameters alpha and gamma is optional. If the values are not given, the code will evaluate on the train and validation set to find the best hyperparameters.
+
+## Results
+
+This version does not have the kernel implementation used in the paper. Hence the results fluctuate by a margin of 1-4%. 
+
+The results are taken from the paper [Zero-Shot Learning - A Comprehensive Evaluation of the Good, the Bad and the Ugly](https://arxiv.org/pdf/1707.00600.pdf) and are evaluated for features extracted from ResNet-50 for the Proposed split.
+
+| Dataset       | Paper - (top-1 accuracy in %) | Respository Results | Hyper-params(trainval & test) |
+| ------------- |:-----------------------------:| :-------------------:| :--------------------------:|
+| CUB        |    53.9      | 51.31 | Alpha=2, Gamma=0 |
+| AWA1    |  58.2 | 56.19 | Alpha=3, Gamma=0 |
+| AWA2 | 58.6 | 54.50 | Alpha=3, Gamma=0 |
+| aPY | 38.3 | 38.47 | Alpha=3, Gamma=-1|
+| SUN | 54.5 | 55.62 | Alpha=2, Gamma=2 |
+
+
+## References
+
+If this repository was useful for your research, please cite.
+
 ```
-
-## License 
-
-Ledbetter is distributed under the MIT license.
-
+@misc{chichilicious,
+  author = {Bharadwaj, Shrisha},
+  title = {embarrsingly-simple-zero-shot-learning},
+  year = {2018},
+  publisher = {GitHub},
+  journal = {GitHub repository},
+  howpublished = {\url{https://github.com/chichilicious/embarrsingly-simple-zero-shot-learning}},
+}
+```
